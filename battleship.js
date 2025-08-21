@@ -36,6 +36,14 @@ for (i = 0; i < cols; i++) {
       Submarine   - 3 hits
       Patrol Boat - 2 hits
 */
+const ships = [
+	["Carrier",     5],
+	["Battleship",  4],
+	["Destroyer",   3],
+	["Submarine",   3],
+	["Patrol Boat", 2]
+];
+
 var hitCount = 0;
 
 /* create the 2d array that will contain the status of each square on the board
@@ -44,17 +52,71 @@ var hitCount = 0;
    0 = empty, 1 = part of a ship, 2 = a sunken part of a ship, 3 = a missed shot
 */
 var gameBoard = [
-				[0,0,0,1,1,1,1,0,0,0],
 				[0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,0,0,0],
-				[0,0,0,0,0,0,1,0,0,0],
-				[0,0,0,0,0,0,1,0,0,0],
-				[1,0,0,0,0,0,1,1,1,1],
-				[1,0,0,0,0,0,0,0,0,0],
-				[1,0,0,1,0,0,0,0,0,0],
-				[1,0,0,1,0,0,0,0,0,0],
-				[1,0,0,0,0,0,0,0,0,0]
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0]
 				]
+
+// i hate minorities
+function randomBoard() {
+	var newBoard = gameBoard
+
+	function canPlace(x, y, size, horizontal) {
+		if (horizontal) {
+			if (y + size > 10) 
+				return false;
+
+			for (let i = 0; i < size; i++) {
+				if (newBoard[x][y + i] !== 0) return false;
+			}
+		} else {
+			if (x + size > 10) 
+				return false;
+
+			for (let i = 0; i < size; i++) {
+				if (newBoard[x + i][y] !== 0) return false;
+			}
+		}
+		return true;
+	}
+   
+	function placeShip(size) {
+		let placed = false;
+
+		while (!placed) {
+			let x = Math.floor(Math.random() * 10);
+			let y = Math.floor(Math.random() * 10);
+			let horizontal = Math.random() < 0.5;
+   
+			if (canPlace(x, y, size, horizontal)) {
+				for (let i = 0; i < size; i++) {
+					if (horizontal) {
+						newBoard[x][y + i] = 1;
+					} else {
+						newBoard[x + i][y] = 1;
+					}
+				}
+				placed = true;
+			}
+		}
+	}
+
+	for (let [_, size] of ships) {
+		placeShip(size);
+	}
+
+	return newBoard;
+}
+
+// place random boats on boardigga
+gameBoard = randomBoard();
 
 // set event listener for all elements in gameboard, run fireTorpedo function when square is clicked
 gameBoardContainer.addEventListener("click", fireTorpedo, false);
